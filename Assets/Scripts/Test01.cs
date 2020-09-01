@@ -32,36 +32,18 @@ namespace tetriskit
 
         public void Fall()
         {
-            currentMino.transform.position += Vector3.down;
-            if (GridManager.Instance != null)
+            if (GridManager.Instance != null && !GridManager.Instance.Fall(currentMino))
             {
-                if (GridManager.Instance.IsValidGridPosition(currentMino.transform))
-                {
-                    // アップデート
-                    GridManager.Instance.UpdateGrid(currentMino.transform);
-                }
-                else
-                {
-                    currentMino.transform.position += Vector3.up;
-                }
+                currentMino.movementController.enabled = false;
+                currentMino.enabled = false;
+                currentMino = null;
+
+                GridManager.Instance.PlaceMinos();
             }
         }
-        public void MoveHorizontal(Vector2 direction)
+        public void MoveLeft(bool _bIsLeft)
         {
-            float deltaMovement = (direction.Equals(Vector2.right)) ? 1.0f : -1.0f;
-
-            // Modify position
-            transform.position += new Vector3(deltaMovement, 0, 0);
-
-            // Check if it's valid
-            if (GridManager.Instance != null && GridManager.Instance.IsValidGridPosition(this.transform))// It's valid. Update grid.
-            {
-                GridManager.Instance.UpdateGrid(this.transform);
-            }
-            else // It's not valid. revert movement operation.
-            {
-                transform.position += new Vector3(-deltaMovement, 0, 0);
-            }
+            GridManager.Instance.MoveHorizontal(currentMino, _bIsLeft);
         }
 
 

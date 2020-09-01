@@ -7,12 +7,7 @@ namespace tetriskit
     public class MinoMovementController : MonoBehaviour
     {
 
-
-
-
-
-       
-   public float transitionInterval = 0.8f;
+        public float transitionInterval = 0.8f;
         public void DeleteGuide()
         {
             List<Transform> delete_list = new List<Transform>();
@@ -55,6 +50,10 @@ namespace tetriskit
             transform.position = new Vector3(
                 Mathf.Round(transform.position.x),
                 Mathf.Round(transform.position.y));
+        }
+        public void Fall()
+        {
+            transform.position += Vector3.down;
         }
     }
 }

@@ -12,7 +12,7 @@ namespace tetriskit
 			{
 				if(on_update != value)
 				{
-					m_bInitOnUpdate = true;
+					//m_bInitOnUpdate = true;
 					on_update_begin = value;
 					on_update = value;
 				}
@@ -22,7 +22,7 @@ namespace tetriskit
 		private System.Action<bool> on_update_begin;
 		private System.Action<bool> on_update;
 		//	, OnFixedUpdate, OnLateUpdate;
-		private bool m_bInitOnUpdate = true;
+		//private bool m_bInitOnUpdate = true;
 		//private bool m_bInitOnFixedUpdate = true;
 		//private bool m_bInitOnLateUpdate = true;
 
@@ -39,7 +39,7 @@ namespace tetriskit
 				{
 					on_update(false);
 				}
-				m_bInitOnUpdate = false;
+				//m_bInitOnUpdate = false;
 			}
 		}
 		/*
