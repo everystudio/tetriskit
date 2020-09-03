@@ -24,11 +24,20 @@ namespace tetriskit
 
             if (GUILayout.Button("RotateLeft"))
             {
-                script.Rotate(false);
+                script.RotateClockWise(false);
             }
             if (GUILayout.Button("RotateRight"))
             {
-                script.Rotate(true);
+                script.RotateClockWise(true);
+            }
+
+            if (GUILayout.Button("Ghost"))
+            {
+                script.Ghost();
+            }
+            if (GUILayout.Button("GhostDelete"))
+            {
+                script.DeleteGhost();
             }
         }
     }

@@ -6,7 +6,7 @@ namespace tetriskit
 {
     public class MinoMovementController : MonoBehaviour
     {
-
+        public Transform m_tfPivot;
         public float transitionInterval = 0.8f;
         public void DeleteGuide()
         {
@@ -38,23 +38,89 @@ namespace tetriskit
                 }
             }
         }
-        public void Rotate( bool _bIsCw)
+        public void RotateClockWise( bool _bIsCw)
         {
             //currentMino.movementController.RotateClockWise(_bIsCw);
             float rotationDegree = (_bIsCw) ? 90.0f : -90.0f;
-            transform.RotateAround(
-                transform.position + transform.up * 0.5f + transform.right * 0.5f,
+            m_tfPivot.RotateAround(
+                m_tfPivot.position,// + transform.up * 0.5f + transform.right * 0.5f
                 Vector3.forward,
                 rotationDegree);
 
+            /*
             transform.position = new Vector3(
                 Mathf.Round(transform.position.x),
                 Mathf.Round(transform.position.y));
+                */
         }
         public void Fall()
         {
             transform.position += Vector3.down;
         }
+
+        public void DeleteGhost()
+        {
+            List<Transform> ghost_list = new List<Transform>();
+            foreach (Transform t in transform)
+            {
+                if (t.tag == "BlockGhost")
+                {
+                    ghost_list.Add(t);
+                }
+            }
+            foreach (Transform t in ghost_list)
+            {
+                DestroyImmediate(t.gameObject);
+            }
+        }
+
+        public void Ghost()
+        {
+            //Debug.Log(gameObject.GetComponentsInChildren<Transform>().Length);
+
+            List<Transform> ghost_list = new List<Transform>();
+            List<Transform> block_list = new List<Transform>();
+            foreach ( Transform t in transform.GetComponentsInChildren<Transform>())
+            {
+                if( t.tag == "BlockGhost")
+                {
+                    ghost_list.Add(t);
+                }
+                else if( t.tag == "Block")
+                {
+                    block_list.Add(t);
+                }
+            }
+            foreach (Transform t in ghost_list)
+            {
+                DestroyImmediate(t.gameObject);
+            }
+            foreach(Transform t in block_list)
+            {
+                GameObject ghost = Instantiate(t.gameObject, transform) as GameObject;
+                ghost.tag = "BlockGhost";
+                Color block_color = ghost.GetComponent<SpriteRenderer>().color;
+                ghost.GetComponent<SpriteRenderer>().color = new Color(
+                    block_color.r,
+                    block_color.g,
+                    block_color.b,
+                    0.5f
+                    );
+                ghost.transform.position = t.position;
+            }
+        }
+        public void GhostMove(bool _bDown)
+        {
+            Vector3 move = _bDown ? Vector3.down : Vector3.up;
+            foreach (Transform t in transform)
+            {
+                if (t.tag == "BlockGhost")
+                {
+                    t.position += move;
+                }
+            }
+        }
+
     }
 }
 

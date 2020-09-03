@@ -39,24 +39,21 @@ namespace tetriskit
             return ((int)pos.x >= 0 && (int)pos.x < Defines.GridWidthMax && (int)pos.y >= 0);
         }
 
-        public bool IsValidGridPosition(Transform _obj)
+        public bool IsValidGridPosition(Mino _mino , string _targetTag = "Block" )
         {
-            foreach (Transform child in _obj)
+            foreach (Transform child in _mino.transform.GetComponentsInChildren<Transform>())
             {
-                if (child.gameObject.tag.Equals("Block"))
+                if (child.gameObject.tag.Equals(_targetTag))
                 {
                     Vector2 v = Defines.roundVec2(child.position- m_tfPivot.position);
                     //Debug.Log(v);
                     if (!InsideBorder(v))
                     {
-                        //Debug.Log(child.gameObject.name);
-                        //Debug.Log(child.position);
-                        //Debug.Log(m_tfPivot.position);
                         return false;
                     }
 
                     if (grid[(int)v.y,(int)v.x] != null &&
-                        grid[(int)v.y, (int)v.x].parent != _obj)
+                        grid[(int)v.y, (int)v.x].GetComponentInParent<Mino>() != _mino)
                     {
                         return false;
                     }
@@ -70,15 +67,17 @@ namespace tetriskit
             bool bRet = false;
 
             _mino.transform.position += Vector3.down;
-            if (IsValidGridPosition(_mino.transform))
+            if (IsValidGridPosition(_mino))
             {
                 // アップデート
-                UpdateGrid(_mino.transform);
+                GhostFix(_mino);
+                UpdateGrid(_mino);
                 bRet = true;
             }
             else
             {
                 Debug.Log("revert");
+                _mino.movementController.DeleteGhost();
                 _mino.transform.position += Vector3.up;
             }
             return bRet;
@@ -92,17 +91,32 @@ namespace tetriskit
             _mino.transform.position += new Vector3(deltaMovement, 0, 0);
 
             // Check if it's valid
-            if ( IsValidGridPosition(_mino.transform))// It's valid. Update grid.
+            if ( IsValidGridPosition(_mino))// It's valid. Update grid.
             {
-                UpdateGrid(_mino.transform);
+                UpdateGrid(_mino);
             }
             else // It's not valid. revert movement operation.
             {
                 _mino.transform.position += new Vector3(-deltaMovement, 0, 0);
             }
+            GhostFix(_mino);
         }
 
-        public void UpdateGrid(Transform _obj)
+        public void RotateClockWise(bool _bIsCw , Mino _mino )
+        {
+            _mino.movementController.RotateClockWise(_bIsCw);
+            if(IsValidGridPosition(_mino))
+            {
+                UpdateGrid(_mino);
+            }
+            else
+            {
+                _mino.movementController.RotateClockWise(!_bIsCw);
+            }
+            GhostFix(_mino);
+        }
+
+        public void UpdateGrid(Mino _mino)
         {
             // 一度対象のオブジェクトのgridデータを削除
             for (int y = 0; y < Defines.GridHeightMax; y++)
@@ -111,7 +125,7 @@ namespace tetriskit
                 {
                     if (grid[y,x] != null)
                     {
-                        if (grid[y, x].parent == _obj)
+                        if (grid[y, x].parent == _mino.movementController.m_tfPivot)
                         {
                             grid[y, x] = null;
                         }
@@ -120,12 +134,26 @@ namespace tetriskit
             }
 
             // 対象のオブジェクトのグリッドを位置から
-            foreach (Transform child in _obj)
+            foreach (Transform child in _mino.movementController.m_tfPivot)
             {
                 if (child.gameObject.tag.Equals("Block"))
                 {
                     Vector2 v = Defines.roundVec2(child.position - m_tfPivot.position);
                     grid[(int)v.y, (int)v.x] = child;
+                }
+            }
+        }
+
+        public void GhostFix(Mino _mino)
+        {
+            _mino.movementController.Ghost();
+            for( int i = 0; i < Defines.GridHeightMax; i++)
+            {
+                _mino.movementController.GhostMove(true);
+                if(!IsValidGridPosition(_mino, "BlockGhost"))
+                {
+                    _mino.movementController.GhostMove(false);
+                    break;
                 }
             }
         }
