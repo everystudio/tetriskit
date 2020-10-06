@@ -17,6 +17,18 @@ namespace tetriskit
             {
                 script.Setup();
             }
+
+            if (GUILayout.Button("RandCheck"))
+            {
+                int[] ret = GetStandbyIndex.Get(7);
+                string buf = "";
+                foreach( int i in ret)
+                {
+                    buf += i.ToString();
+                }
+                Debug.Log(buf);
+            }
+
         }
     }
 }

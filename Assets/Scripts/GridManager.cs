@@ -1,12 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace tetriskit
 {
     public class GridManager : Singleton<GridManager>
     {
         public Transform m_tfPivot;
+
+        public Text debug_grid;
+
+
 
         public Transform[,] grid = new Transform[Defines.GridHeightMax,Defines.GridWidthMax];
 
@@ -46,6 +51,7 @@ namespace tetriskit
                 if (child.gameObject.tag.Equals(_targetTag))
                 {
                     Vector2 v = Defines.roundVec2(child.position- m_tfPivot.position);
+                    v += new Vector2(0.0f, 0.0f);
                     //Debug.Log(v);
                     if (!InsideBorder(v))
                     {
@@ -65,6 +71,10 @@ namespace tetriskit
         public bool Fall(Mino _mino)
         {
             bool bRet = false;
+
+            debug_grid.text = "●○" + "\n";
+            debug_grid.text+= "●○";
+
 
             _mino.transform.position += Vector3.down;
             if (IsValidGridPosition(_mino))

@@ -7,23 +7,66 @@ namespace tetriskit
     public class Test01 : MonoBehaviour
     {
         Mino currentMino;
-        public GameObject m_pref;
+        public GameObject[] m_prefMinoArr;
+        public Transform m_tfWaitingHolder;
+
+        public Queue<GameObject> m_queStandbyMino = new Queue<GameObject>();
+
         public GameObject m_goBlockHolder;
+
+        void Start()
+        {
+            int[] make_arr = GetStandbyIndex.Get(m_prefMinoArr.Length);
+
+            for( int i = 0; i < m_prefMinoArr.Length; i++)
+            {
+                int index = make_arr[i];
+                GameObject temp = Instantiate(m_prefMinoArr[index] , m_tfWaitingHolder);
+
+                float fPitchSclae = 0.5f;
+                temp.transform.localScale = Vector3.one * fPitchSclae;
+                temp.transform.localPosition = new Vector3(
+                    0.0f,
+                    i * -4.0f * fPitchSclae,
+                    0.0f);
+
+                m_queStandbyMino.Enqueue(temp);
+            }
+        }
+
+
+
 
         public void Spawn()
         {
             // Spawn Group at current Position
-            GameObject temp = Instantiate(m_pref);
+            GameObject temp = m_queStandbyMino.Dequeue();
 
-            if(currentMino != null)
+            if (currentMino != null)
             {
                 currentMino.movementController.DeleteGhost();
             }
             currentMino = temp.GetComponent<Mino>();
             temp.transform.parent = m_goBlockHolder.transform;
+            temp.transform.localScale = Vector3.one;
             temp.transform.localPosition = Vector3.zero;
 
             GridManager.Instance.GhostFix(currentMino);
+
+
+            int iLoopIndex = 0;
+            foreach( GameObject obj in m_queStandbyMino)
+            {
+                float fPitchSclae = 0.5f;
+                obj.transform.localScale = Vector3.one * fPitchSclae;
+                obj.transform.localPosition = new Vector3(
+                    0.0f,
+                    iLoopIndex * -4.0f * fPitchSclae,
+                    0.0f);
+
+                iLoopIndex += 1;
+            }
+
         }
 
         public void RotateClockWise(bool _bIsCw)
