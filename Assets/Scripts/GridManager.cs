@@ -34,6 +34,7 @@ namespace tetriskit
                     gridassist.transform.localPosition = new Vector3(x, y);
                 }
             }
+
             transform.position = new Vector3(
                 Mathf.Round(transform.position.x),
                 Mathf.Round(transform.position.y));
@@ -42,6 +43,22 @@ namespace tetriskit
         public bool InsideBorder(Vector2 pos)
         {
             return ((int)pos.x >= 0 && (int)pos.x < Defines.GridWidthMax && (int)pos.y >= 0);
+        }
+
+        public bool IsAlive(Mino _mino)
+        {
+            foreach (Transform child in _mino.transform.GetComponentsInChildren<Transform>())
+            {
+                if (child.gameObject.tag.Equals("Block"))
+                {
+                    Vector2 v = Defines.roundVec2(child.position - m_tfPivot.position);
+                    if( v.y < 20)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         public bool IsValidGridPosition(Mino _mino , string _targetTag = "Block" )
@@ -68,7 +85,7 @@ namespace tetriskit
             return true;
         }
 
-        public bool Fall(Mino _mino)
+        public bool Fall(Mino _mino , int _iPitch = 1 )
         {
             bool bRet = false;
 
@@ -76,7 +93,7 @@ namespace tetriskit
             debug_grid.text+= "●○";
 
 
-            _mino.transform.position += Vector3.down;
+            _mino.transform.position += (Vector3.down * _iPitch);
             if (IsValidGridPosition(_mino))
             {
                 // アップデート
@@ -88,7 +105,7 @@ namespace tetriskit
             {
                 Debug.Log("revert");
                 _mino.movementController.DeleteGhost();
-                _mino.transform.position += Vector3.up;
+                _mino.transform.position += (Vector3.up * _iPitch);
             }
             return bRet;
         }
