@@ -3859,7 +3859,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u25CB\u25CF"
+  m_Text: "\u25CB<color=red>\u25CF</color>"
 --- !u!222 &975929837
 CanvasRenderer:
   m_ObjectHideFlags: 0
